@@ -2,6 +2,8 @@ var express = require('express');
 var path = require('path');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
+var moment = require('moment');
+var now = moment();
 var app = express();
 
 //listen on port 8000
@@ -22,7 +24,8 @@ mongoose.connect('mongodb://localhost/quotes');
 
 var QuoteSchema = new mongoose.Schema({
 		name: String,
-		quote: String
+		quote: String,
+		created_at: Date 
 })
 var Quote = mongoose.model('Quote', QuoteSchema);
 app.get('/', function(req, res){res.render('index')});
@@ -35,12 +38,12 @@ app.get('/main', function(req, res){
 			console.log('quotes retrieved');
 			res.render('main', {quotes: quotes});
 		}
-	})
+	}).sort({ created_at: -1 } );
 	
 })
 
 app.post('/quote', function(req, res){
-	var quote = new Quote({name: req.body.name, quote: req.body.quote});
+	var quote = new Quote({name: req.body.name, quote: req.body.quote, created_at: now});
 	console.log(req.body);
 	quote.save(function(err){
 		if(err){
